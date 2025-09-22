@@ -1,0 +1,11 @@
+package kr.or.kosa;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Emp {
+	
+	private int empno;
+	private String ename;
+
+}

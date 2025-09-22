@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>ToDo List - 인라인 수정</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input[type="text"] { padding: 5px; width: 200px; }
+    button { margin-left: 5px; }
+    ul { list-style: none; padding-left: 0; }
+    li { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>📝 ToDo List</h2>
+  <input type="text" id="todo-input" placeholder="할 일을 입력하세요" />
+  <button onclick="addTodo()">추가</button>
+
+  <ul id="todo-list"></ul>
+
+  <script>
+  
+    let todos = JSON.parse(localStorage.getItem("todos")) || [];
+    let editingIndex = -1; // 수정 중인 항목 인덱스
+
+    function renderTodos() {
+      const list = document.getElementById("todo-list");
+      list.innerHTML = "";
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+
+        if (editingIndex === index) {
+          // 수정 모드
+          const input = document.createElement("input");
+          input.type = "text";
+          input.value = todo;
+
+          const saveBtn = document.createElement("button");
+          saveBtn.textContent = "저장";
+          saveBtn.onclick = () => {
+            const newValue = input.value.trim();
+            if (newValue) {
+              todos[index] = newValue;
+              editingIndex = -1;
+              saveTodos();
+              renderTodos();
+            }
+          };
+
+          const cancelBtn = document.createElement("button");
+          cancelBtn.textContent = "취소";
+          cancelBtn.onclick = () => {
+            editingIndex = -1;
+            renderTodos();
+          };
+
+          li.appendChild(input);
+          li.appendChild(saveBtn);
+          li.appendChild(cancelBtn);
+        } else {
+          // 일반 모드
+          const span = document.createElement("span");
+          span.textContent = todo;
+          span.style.marginRight = "10px";
+
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "수정";
+          editBtn.onclick = () => {
+            editingIndex = index;
+            renderTodos();
+          };
+
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "삭제";
+          delBtn.onclick = () => deleteTodo(index);
+
+          li.appendChild(span);
+          li.appendChild(editBtn);
+          li.appendChild(delBtn);
+        }
+
+        list.appendChild(li);
+      });
+    }
+
+    const savedTodoList = JSON.parse(localStorage.getItem('saved-items'));
+
+    if (savedTodoList) { // savedTodoList(로컬 데이터)가 존재하면 실행
+        for(let i = 0; i < savedTodoList.length; i++){
+            createTodo(savedTodoList[i]) // 전달인자로 전달
+        }
+    }
+
+    function createTodo (storageData) { // 매개변수
+        const todoList = document.querySelector('#todoList');
+        const newLi = document.createElement('li');
+        const newBtn = document.createElement('button');
+        const newSpan = document.createElement('span');
+        const todoInput = document.querySelector('#todoInput');
+        const deleteAll = document.querySelector('.delete-btn-wrap');
+
+        newLi.appendChild(newBtn);
+        newLi.appendChild(newSpan);
+        // console.log(newLi)
+
+        newSpan.textContent = todoInput.value;
+
+        todoList.appendChild(newLi);
+        // console.log(todoList)
+
+        todoInput.value = '';
+
+        newBtn.addEventListener('click', () => {
+            newLi.classList.toggle('complete');
+
+            saveItemsFn();
+        });
+
+        newLi.addEventListener('dblclick', () => {
+            newLi.remove();
+        });
+
+        saveItemsFn();
+    };
+    
+    
+    function saveItemsFn () { // 로컬에 데이터 저장하기
+        const saveItems = [];
+        for (let i = 0; i < todoList.children.length; i++){
+            const todoObj = {
+                contents: todoList.children[i].querySelector('span').textContent, // 리스트 목록
+                complete: todoList.children[i].classList.contains('complete') // 완료 표시된 리스트
+            };
+            saveItems.push(todoObj); // 배열 추가
+        }
+    	localStorage.setItem('saved-items', JSON.stringify(saveItems)); // localStorage 추가
+    }
+    
+    function addTodo() {
+      const input = document.getElementById("todo-input");
+      const newTodo = input.value.trim();
+
+      if (newTodo) {
+        todos.push(newTodo);
+        input.value = "";
+        saveTodos();
+        renderTodos();
+      }
+    }
+
+    function deleteTodo(index) {
+      todos.splice(index, 1);
+      saveTodos();
+      renderTodos();
+    }
+
+    function saveTodos() {
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+
+    renderTodos();
+    
+  </script>
+
+</body>
+</html>
+​
+​

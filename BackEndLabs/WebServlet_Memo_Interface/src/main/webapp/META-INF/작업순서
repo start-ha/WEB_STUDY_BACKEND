@@ -1,0 +1,111 @@
+1. 요구사항 분석
+2. DB 설계
+3. Table 생성
+
+create table memo(
+ 	id varchar2(20) not null,
+	email varchar2(20) not null,
+	content varchar2(100)
+
+);
+
+//MPA 방법
+4. Model2 기반의 MVC 작업 (sevlet 기반)
+5. 패키지
+6. kosa.co.kr
+
+6.1 
+
+	패키지 구성
+	kr.or.kosa.action
+	kr.or.kosa.ajax( 비동기 별도의 servlet : view 서버에서 생성, 데이터 생성)
+	//지금은 데이터만 넘겨주는게 트랜드긴함.
+	//뷰 만들어서 빼는 방법도 쓰긴함
+	kr.or.kosa.controller : 규모가 커지면> FrontBoardController, AdminController
+	//Spring의 dispatcherservlet과 역할 비슷
+	kr.or.kosa.dao
+	kr.or.kosa.dto
+	kr.or.kosa.service
+	kr.or.kosa.filter
+	kr.or.kosa.utils
+	
+	----------------------------
+	규모가 커지면 도메인별로.....
+	kr.or.kosa.admin.dao
+	kr.or.kosa.dao.admin
+	
+	kr.or.kosa.board.dao
+	kr.or.kosa.dao.board
+	
+6.2
+	controller는 service가 있어야 동작(service에 의존합니다 => Dependency injection 의존성 주입)
+	=> controller는 service 객체의 주소가 필요함
+	
+	service는 dao에 의존합니다. (service에서 dao를 new하던, 주소를 주입)
+	dao는 dto에 의존합니다.
+	
+	순서 dto(데이터담는공간) > dao> service > controller > 데이터 view에게 전달(forward) -> view (EL&JSTL) 출력
+
+6.3 Library
+	DB 연결
+	lombock
+	JSTL (자카르타)
+	Tomcat 10.x	
+	
+6.4 프로젝트 생성 후 
+	db연결 테스트..(DBCP)구성 
+	
+	META-INF > context.xml
+	Lib > ojdbcx.jar
+	테스트용 파일
+	
+	연결 ok (context.xml) 실행
+	
+6.5  연결 Helper 클래스 실행	
+	kr.or.kosa.utils.ConnectionHelper.java
+	ConnectionHelper.jsp (연결 테스트)
+	
+6.6 서버 실행이 안됨 (web.xml 코드 문제, 설정(@....))
+6.7 MPA
+ 웹서버가 클라이언트가 요청하는 모두 가지고 있고, 만들고 서비스하겠다
+ 관리) 보안)
+ webapp > WEB-INF > views > admin > admin.jsp
+ 
+ /WEB-INF/views/board/list.jsp, write.jsp....
+ 
+ views 폴더 생성
+ 
+ webapp > index.jsp or index.html(시작) 
+ 직접 봐도 되는건 view 밑에 넣기...
+ 
+ 6.8
+ 
+ dto -> dao 생성
+ 고민할 거 : lombok으로 라이브러리 자동화할 건데
+ 그 기준은 생성자, getter, setter, toString() 선에서 자동화 할건지
+		
+dao생성 ->함수 기본 5개 (crud)
+helper, connectionpool 쓰는 거까지 작업완료
+
+6.9
+	kr.or.kosa.action
+	
+	인터페이스 Action
+	클래스 ActionForward
+	
+	화면 또는 처리... 두개 구현 강제.. 표준화
+	
+	kr.or.kosa.ajax
+	
+	
+	kr.or.kosa.service
+	구현
+	요청마다 별도의 service 
+	
+	반드시... class 하나가 service 하나 구현..
+	public class MemoListService implements Action {
+	장점	
+	
+	지금은 method하나가 service하나로 생성될 거임...
+	
+	
